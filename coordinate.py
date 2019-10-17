@@ -3,6 +3,7 @@ from sphere_to_cubemap.sphere import Sphere
 # geom3 adopted from https://github.com/phire/Python-Ray-tracer
 from sphere_to_cubemap.geom3 import Vector3, Point3, Ray3, dot, unit
 from math import sqrt
+# hit adopted from https://github.com/phire/Python-Ray-tracer
 from sphere_to_cubemap.hit import Hit
 import numpy  as np
 
