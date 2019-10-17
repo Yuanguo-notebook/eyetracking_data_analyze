@@ -32,15 +32,12 @@ class Sphere(object):
             t0 = (vDotQ - root)
             t1 = (vDotQ + root)
             if t0 < t1:
-                # hit = Hit(self, ray, t0, t1, None, self.material)
+                
                 result = t1
             else:
-                # hit = Hit(self, ray, t1, t0, None, self.material)
+                
                 result = t0
-            # if hit.entry > 0:
-            #     hit.normal = self.normal(ray.pos(hit.entry))
-            # if hit.exit > 0:
-            #     hit.normal2 = self.normal(ray.pos(hit.exit))
+            
             x = ray.start.x + ray.dir.dx * result
             y = ray.start.y + ray.dir.dy * result
             z = ray.start.z + ray.dir.dz * result
