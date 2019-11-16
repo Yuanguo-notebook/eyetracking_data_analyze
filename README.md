@@ -6,8 +6,11 @@ We want to know in each frame if participant was looking at specific area in 360
 
 ## command
 ```
+# convert 360 video to image frams, crop, flipt each image 
 python process_video.py /.../scene5  # with mp4 file in this folder
-python process.py /.../data # see data folder structure 
+
+# convert tobii xml to csv which only has time stamp and hitting point coordinates in 2d. 
+python process.py /.../data    #see data folder structure 
 ```
 
 ## image data folder structure
