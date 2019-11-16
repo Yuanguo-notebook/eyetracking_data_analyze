@@ -34,6 +34,10 @@ data
 │       ├── timestamp.xml
 │       ├── timestamp2.xml
 │       ├── ...
+│   ├── WSU_ED_001_EYE      #processed eye tracking data created by process.py 
+│       ├── timestamp.csv
+│       ├── timestamp2.csv
+│       ├── ...
 │   └── WSU_HRV_001.xlsx  #heart rate data
 │   └── WSU_PR_001.txt    #performance data
 │   └── WSU_RT_001.txt    #reaction time data
