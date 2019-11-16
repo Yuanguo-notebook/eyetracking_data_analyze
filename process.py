@@ -3,12 +3,10 @@
 ################################################
 import pandas as pd
 
-assert (False)
 import sys
 import os
 #
-# sys.path.append('/Users/yuanguo/MHC/BEARS\ LAB/sphere_to_cubemap')
-sys.path.insert(0, '/Users/yuanguo/MHC/BEARS LAB')
+
 print(sys.path)
 import xml.etree.ElementTree as ET
 import math
@@ -190,9 +188,9 @@ def transform_to_equirectangular(point, geo_w, geo_h, color):
 # im = plt.imread('flipped_out.jpg')
 # implot = plt.imshow(im)
 
+ # folder structure see readme
+dirname = sys.argv[1]
 
-# dirname = sys.argv[1]
-dirname = '/....../data' # folder structure see readme
 print ("the folder has the name %s" % (dirname))
 
 tobii_folder_name = 'WSU_ED'
