@@ -1,8 +1,9 @@
 ################################################
 ## convert xml to hitting points with csv file
 ################################################
+import pandas as pd
 
-
+assert (False)
 import sys
 import os
 #
@@ -190,41 +191,58 @@ def transform_to_equirectangular(point, geo_w, geo_h, color):
 # implot = plt.imshow(im)
 
 
-dirname = sys.argv[1]
+# dirname = sys.argv[1]
+dirname = '/....../data' # folder structure see readme
 print ("the folder has the name %s" % (dirname))
-file_list = os.listdir(dirname)
-print('This folder has ', file_list, ' files.')
 
-for file_name in file_list:
-    if 'xml' in file_name:
-        f = open(dirname + '/'+file_name.split('.')[0] + '.csv', 'w',  encoding="utf-8")
-        writer = csv.writer(f)
+tobii_folder_name = 'WSU_ED'
+tobii_path = ''
+participants_files = os.listdir(dirname)
+for par_id in participants_files:
+    # files are 001, 002
+    if len(par_id) == 3:
+        single_par_folder = os.listdir(dirname + '/' + par_id)
+        for single_file in single_par_folder:
+            if tobii_folder_name in single_file:
+                tobii_path = dirname  + '/' + par_id + '/' + single_file
+                os.mkdir(tobii_path + '_EYE')
+                print('current in : '+tobii_path)
+
+
+                file_list = os.listdir(tobii_path)
+                print('This folder has ', file_list, ' files.')
+
+                for file_name in file_list:
+                    if 'xml' in file_name:
+                        f = open(tobii_path +'_EYE'+ '/'+file_name.split('.')[0] + '.csv', 'w',  encoding="utf-8")
+                        writer = csv.writer(f)
 
 
 
-        tree = ET.parse(dirname + '/'+file_name)
-        root = tree.getroot()
+                        tree = ET.parse(tobii_path + '/'+file_name)
+                        root = tree.getroot()
 
-        for child in root:
-            timestamp = child.attrib['TimeStamp']
-            for c in child:
+                        for child in root:
+                            timestamp = child.attrib['TimeStamp']
+                            for c in child:
 
-                if 'CombinedGazeRayWorld' in c.tag:
-                    # print(c.attrib)
-                    # print(c.attrib['Direction'])
-                    str_list = c.attrib['Direction'][1:-1].split(', ')
-                    combined_ray = np.array([0.0, 0.0, 0.0])
-                    for m in range(3):
-                        combined_ray[m] = str_list[m]
-                    hitpoint_wheel = get_hit_point_draw(combined_ray, 'g')
-                    projPoint_w = transform_to_equirectangular(hitpoint_wheel, 3840, 1080, 'g')
-                    # f.write(timestamp + '|' + str(projPoint_w[0]) + ',' + str(projPoint_w[1]) + '\n')
-                    writer.writerow([timestamp, str(projPoint_w[0]), str(projPoint_w[1])])
+                                if 'CombinedGazeRayWorld' in c.tag:
+                                    # print(c.attrib)
+                                    # print(c.attrib['Direction'])
+                                    str_list = c.attrib['Direction'][1:-1].split(', ')
+                                    combined_ray = np.array([0.0, 0.0, 0.0])
+                                    for m in range(3):
+                                        combined_ray[m] = str_list[m]
+                                    hitpoint_wheel = get_hit_point_draw(combined_ray, 'g')
+                                    projPoint_w = transform_to_equirectangular(hitpoint_wheel, 3840, 1080, 'g')
+                                    # f.write(timestamp + '|' + str(projPoint_w[0]) + ',' + str(projPoint_w[1]) + '\n')
+                                    writer.writerow([timestamp, str(projPoint_w[0]), str(projPoint_w[1])])
 
-f.close()
-print('finish')
+                        f.close()
 
-# plt.show()
+print('All finish')
+
+
 
 
 
