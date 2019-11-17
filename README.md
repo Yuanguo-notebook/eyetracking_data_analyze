@@ -11,6 +11,9 @@ python process_video.py /.../scene5  # with mp4 file in this folder
 
 # convert tobii xml to csv which only has time stamp and hitting point coordinates in 2d. 
 python process.py /.../data    #see data folder structure 
+
+# combine all data into a csv including reaction time, score, fixation of each scene and each participant
+python eye_gaze_processing.py data_dir_name
 ```
 
 ## image data folder structure
