@@ -1,6 +1,6 @@
 
 
-from sphere_to_cubemap.geom3 import Vector3, Point3, Ray3, dot, unit
+from geom3 import dot
 from math import sqrt
 
 
@@ -17,8 +17,7 @@ class Sphere(object):
         l = self.centre - ray.start # C-O
         tca = dot(ray.dir, l) # tca
 
-        squareDiffs = dot(l, l) - self.radius * self.radius
-        discrim = tca * tca - squareDiffs
+        discrim = tca * tca - dot(l, l) + self.radius * self.radius
         if discrim >= 0:
             thc = sqrt(discrim)
             t0 = (tca - thc)
