@@ -12,24 +12,24 @@ import xml.etree.ElementTree as ET
 import math
 from sphere_to_cubemap.sphere import Sphere
 
-# geom3 adopted from https://github.com/phire/Python-Ray-tracer
+# geom3 from https://github.com/phire/Python-Ray-tracer
 from sphere_to_cubemap.geom3 import Vector3, Point3, Ray3, dot, unit
 from math import sqrt
-from sphere_to_cubemap.hit import Hit
+
 import numpy  as np
 
 from pyquaternion import Quaternion
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D # <--- This is important for 3d plotting
+from mpl_toolkits.mplot3d import Axes3D # for 3d plotting
 from sphere_to_cubemap.angles import *
 from PIL import Image
 
 import csv
 
 # map equirectangular image to sphere
-# adopted from https://stackoverflow.com/questions/53074908/map-an-image-onto-a-sphere-and-plot-3d-trajectories
+# from https://stackoverflow.com/questions/53074908/map-an-image-onto-a-sphere-and-plot-3d-trajectories
 count = 3000
 def mpl_sphere(image_file):
     img = plt.imread(image_file)
@@ -109,7 +109,7 @@ def unity_to_python_point(old):
 
 
 # rotate a vector by quaternion rotation
-# https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
+# math formula from https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
 def rotate_vec_by_quaternion(quat, vec):
     quatx = quat[0]
     quaty = quat[1]
