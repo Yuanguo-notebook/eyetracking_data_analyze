@@ -3,6 +3,37 @@ This project is developed for analyzing tobii(embeded in HTC vive) eye tracking 
 
 We want to know in each frame if participant was looking at specific area in 360 video. In unity, 360 video is projected on the surface of a sphere. The first thing we do is to find hitting point on the sphere according to pose(participant's position in world coordinate), rotation of vr headset and combined gaze direction. Then we convert the point on 3d sphere to point on equirectangular picture. Therefore we are able to know if that point falls in specific area.
 
+## find intersection of vector and a sphere
+```
+l = sphere.centre - ray.start # C-O
+tca = dot(ray.dir, l) # tca
+discrim = tca * tca - dot(l, l) + self.radius * self.radius
+if discrim >= 0:
+    thc = sqrt(discrim)
+    t0 = (tca - thc)
+    t1 = (tca + thc)
+    if t0 < t1:
+        result = t1
+    else:
+        result = t0
+    x = ray.start.x + ray.dir.dx * result
+    y = ray.start.y + ray.dir.dy * result
+    z = ray.start.z + ray.dir.dz * result
+```
+
+## convert point(x,y,z) on 3D sphere(360 video) to 2D equirectangular image
+```
+theta_value = math.atan2(y, x)
+phi_value = math.acos(z)
+if phi_value <0 :
+    phi_value += np.pi
+if theta_value <0 :
+    theta_value += 2*np.pi
+
+# project back to equirectangular
+geo_x_px = (theta_value / (2 * np.pi)) * image_w
+geo_y_px = (phi_value / (np.pi)) * image_h
+```
 
 ## command
 ```
