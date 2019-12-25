@@ -1,74 +1,32 @@
 ################################################
-## convert xml to hitting points with csv file
+## 1.convert xml to hitting points with csv file
 ################################################
 import pandas as pd
 
 import sys
 import os
-#
 
+sys.path.insert(0, '/Users/yuanguo/MHC/BEARS LAB')
 print(sys.path)
 import xml.etree.ElementTree as ET
 import math
-from sphere_to_cubemap.sphere import Sphere
+from process_eye_data.sphere import Sphere
 
-# geom3 from https://github.com/phire/Python-Ray-tracer
+# geom3 adopted from https://github.com/phire/Python-Ray-tracer
 from sphere_to_cubemap.geom3 import Vector3, Point3, Ray3, dot, unit
 from math import sqrt
 
 import numpy  as np
 
-from pyquaternion import Quaternion
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D # for 3d plotting
-from sphere_to_cubemap.angles import *
+from mpl_toolkits.mplot3d import Axes3D # <--- This is important for 3d plotting
+# from sphere_to_cubemap.angles import *
 from PIL import Image
 
 import csv
 
-# map equirectangular image to sphere
-# from https://stackoverflow.com/questions/53074908/map-an-image-onto-a-sphere-and-plot-3d-trajectories
-count = 3000
-def mpl_sphere(image_file):
-    img = plt.imread(image_file)
-
-    # define a grid matching the map size, subsample along with pixels
-    # evenly create img.shape[0 number of points between 0  and pi
-    theta = np.linspace(0, np.pi, img.shape[0])
-    phi = np.linspace(0, 2*np.pi, img.shape[1])
-
-
-
-    # count = 3000 # keep 45 points along theta and phi
-    # get index evenly for 45 points
-    theta_inds = np.linspace(0, img.shape[0] - 1, count).round().astype(int)
-    phi_inds = np.linspace(0, img.shape[1] - 1, count).round().astype(int)
-
-    # get value for 45 points
-    theta = theta[theta_inds]
-    phi = phi[phi_inds]
-
-    # recreate image
-    img = img[np.ix_(theta_inds, phi_inds)]
-    # image = Image.fromarray(img, 'RGB')
-    # image.show()
-
-
-    theta,phi = np.meshgrid(theta, phi)
-
-    R = 1
-
-
-    # sphere to xyz
-    x = R * np.sin(theta) * np.cos(phi)
-    y = R * np.sin(theta) * np.sin(phi)
-    z = R * np.cos(theta)
-
-
-
-    return theta,phi
 
 
 #check if point is on surface of sphere
@@ -93,8 +51,7 @@ let's get the hitting point by pose, camera rotation and gazeRay
 
 center = [0, 0, 0]
 
-image_file = 'flipped_out.jpg'
-theta,phi = mpl_sphere(image_file)
+
 
 # switch y and z axis
 def unity_to_python_point(old):
@@ -109,7 +66,7 @@ def unity_to_python_point(old):
 
 
 # rotate a vector by quaternion rotation
-# math formula from https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
+# https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation
 def rotate_vec_by_quaternion(quat, vec):
     quatx = quat[0]
     quaty = quat[1]
@@ -141,7 +98,7 @@ def get_hit_point_draw(combined_ray, linecolor):
     end = start + dir
 
     #get hitting point
-    sphere = Sphere(Point3(0,0,0), 1, None)
+    sphere = Sphere(Point3(0,0,0), 1)
     ray = Ray3(Point3(start[0], start[1], start[2]), Vector3(dir[0], dir[1], dir[2]))
     hitpoint = sphere.intersect(ray)
 
@@ -164,32 +121,22 @@ def get_hit_point_draw(combined_ray, linecolor):
 def transform_to_equirectangular(point, geo_w, geo_h, color):
 
     # from -pi to pi, so need to add 2pi if it is negative
-    phi_value = math.atan2(point[1], point[0])
-    theta_value = math.acos(point[2])
+    theta_value = math.atan2(point[1], point[0])
+    phi_value = math.acos(point[2])
     if phi_value <0 :
-        phi_value += 2*np.pi
+        phi_value += np.pi
 
-    # get index of current theta value
-    theta_index = int(count * (theta_value / np.pi))
-    phi_index = int(count * (phi_value / (2 * np.pi)))
-
-
-    # get the transpose value for theta and phi
-    theta_value2 = theta[0][int(phi_index)]
-    phi_value2 = phi[theta_index][0]
+    if theta_value <0 :
+        theta_value += 2*np.pi
 
     # project back to equirectangular
-    geo_x_px = ( theta_value2 / np.pi )* geo_w
-    geo_y_px = (phi_value2 / (2*np.pi)) * geo_h
+    geo_x_px = (theta_value / (2 * np.pi)) * geo_w
+    geo_y_px = (phi_value / (np.pi)) * geo_h
 
-    # plt.scatter([geo_x_px], [geo_y_px], s=40, color=color)
     return [geo_x_px, geo_y_px]
 
-# im = plt.imread('flipped_out.jpg')
-# implot = plt.imshow(im)
 
- # folder structure see readme
-dirname = sys.argv[1]
+dirname = sys.argv[1] # PUF WSU DATA see readme folder structure, dir should contain 001 002
 
 print ("the folder has the name %s" % (dirname))
 
@@ -203,19 +150,16 @@ for par_id in participants_files:
         for single_file in single_par_folder:
             if tobii_folder_name in single_file:
                 tobii_path = dirname  + '/' + par_id + '/' + single_file
-                os.mkdir(tobii_path + '_EYE')
+                # create folder for coordinate on 2d image
+                os.mkdir(tobii_path + '_EYE2')
                 print('current in : '+tobii_path)
-
-
                 file_list = os.listdir(tobii_path)
-                print('This folder has ', file_list, ' files.')
+                # print('This folder has ', file_list, ' files.')
 
                 for file_name in file_list:
                     if 'xml' in file_name:
-                        f = open(tobii_path +'_EYE'+ '/'+file_name.split('.')[0] + '.csv', 'w',  encoding="utf-8")
+                        f = open(tobii_path +'_EYE2'+ '/'+file_name.split('.')[0] + '.csv', 'w',  encoding="utf-8")
                         writer = csv.writer(f)
-
-
 
                         tree = ET.parse(tobii_path + '/'+file_name)
                         root = tree.getroot()
@@ -225,15 +169,12 @@ for par_id in participants_files:
                             for c in child:
 
                                 if 'CombinedGazeRayWorld' in c.tag:
-                                    # print(c.attrib)
-                                    # print(c.attrib['Direction'])
                                     str_list = c.attrib['Direction'][1:-1].split(', ')
                                     combined_ray = np.array([0.0, 0.0, 0.0])
                                     for m in range(3):
                                         combined_ray[m] = str_list[m]
-                                    hitpoint_wheel = get_hit_point_draw(combined_ray, 'g')
-                                    projPoint_w = transform_to_equirectangular(hitpoint_wheel, 3840, 1080, 'g')
-                                    # f.write(timestamp + '|' + str(projPoint_w[0]) + ',' + str(projPoint_w[1]) + '\n')
+                                    hitpoint_2d = get_hit_point_draw(combined_ray, 'g')
+                                    projPoint_w = transform_to_equirectangular(hitpoint_2d, 3840, 1080, 'g')
                                     writer.writerow([timestamp, str(projPoint_w[0]), str(projPoint_w[1])])
 
                         f.close()

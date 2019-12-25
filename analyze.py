@@ -1,5 +1,6 @@
 ################################################
-## analyze hitting points
+## 2. analyze hitting points
+## get data of which object they are looking at
 ################################################
 
 import matplotlib.pyplot as plt
@@ -13,8 +14,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import patches
 
-# im = plt.imread('image40.jpg')
-# implot = plt.imshow(im)
 ################################################
 # global variables
 ################################################
@@ -89,13 +88,15 @@ def convert_to_box(points):
 
 
 annot_dir = '/Users/yuanguo/MHC/BEARS LAB/images/demo'
-data_dir_name = '/Users/yuanguo/MHC/BEARS LAB/data/PUF WSU DATA'
+data_dir_name = '/Users/yuanguo/MHC/BEARS LAB/data/PUF WSU DATA 2'
 print ("the folder is %s" % (data_dir_name))
 
-tobii_eye_folder_name = 'EYE'
+tobii_eye_folder_name = 'EYE2'
 tobii_path = ''
 participants_ids = os.listdir(data_dir_name)
 
+# opens eye tracking data folder which contains
+# 2d hitting points we just generated
 for par_id in participants_ids:
     # files are 001, 002
     if len(par_id) == 3:
@@ -123,8 +124,7 @@ for par_id in participants_ids:
                         if start_timestamp ==0:
                             start_timestamp = int(row[0])
                         time_eye_dict[int(row[0])] = [float(row[1]), float(row[2])]
-                    # print(time_eye_dict)
-                    # print(start_timestamp)
+
 
                     # read annotation files
                     result = pd.read_csv("result.csv")
@@ -144,7 +144,7 @@ for par_id in participants_ids:
                     poly_file_names = os.listdir(annot_dir_curr)
                     poly_json_file_names = include_to_list(poly_file_names, 'json')
                     poly_json_file_names.sort()
-                    # print('after remove:',poly_json_file_names)
+
 
 
                     result_scene_dict = {'timestamp':[], 'image':[]}
@@ -180,16 +180,16 @@ for par_id in participants_ids:
                         else:
                             curr_img = prev
                         ###
-                        # flag_img = False
-                        # # print(curr_img)
-                        # if curr_img =='image55':
-                        #
-                        #     flag_img = True
-                        #     plt.figure()
-                        #     im = plt.imread(annot_dir_curr + '/' + curr_img + '.jpg')
-                        #     fig, ax = plt.subplots(1)
-                        #     ax.imshow(im)
-                        #     plt.scatter([value[0]], [value[1]], s=1, color='g')
+                        flag_img = False
+
+                        if os.path.exists('pics/'+curr_scene+'_'+curr_img+'.png') == False:
+
+                            flag_img = True
+                            plt.figure()
+                            im = plt.imread(annot_dir_curr + '/' + curr_img + '.jpg')
+                            fig, ax = plt.subplots(1)
+                            ax.imshow(im)
+                            plt.scatter([value[0]], [value[1]], s=1, color='g')
                         ####
 
                         with open(annot_dir_curr + '/' + curr_img + '.json') as img_f:
@@ -214,21 +214,21 @@ for par_id in participants_ids:
                                     result_scene_dict[label] = ['NA']*(len(result_scene_dict['timestamp'])-1)
                                     result_scene_dict[label].append(flag)
                                 ####
-                                # if curr_img =='image55':
-                                #     # print('poly')
-                                #     x, y = poly.exterior.coords.xy
-                                #     draw_points = np.array([x, y], np.int32).T
-                                #
-                                #     polygon_shape = patches.Polygon(draw_points, linewidth=1, edgecolor='r', facecolor='none')
-                                #     ax.add_patch(polygon_shape)
+                                if flag_img ==True:
+
+                                    x, y = poly.exterior.coords.xy
+                                    draw_points = np.array([x, y], np.int32).T
+
+                                    polygon_shape = patches.Polygon(draw_points, linewidth=1, edgecolor='r', facecolor='none')
+                                    ax.add_patch(polygon_shape)
                                 ####
                             prev = curr_img
                         ########
-                        # if curr_img =='image55':
-                        #     # print('save')
-                        #     plt.savefig('pics/' + str(count).zfill(9) + '.png')
-                        #     plt.close(fig)
-                        #     count += 1
+                        if flag_img ==True:
+
+                            plt.savefig('pics/' + curr_scene+'_'+curr_img + '.png')
+                            plt.close(fig)
+                            count += 1
                         ########
                     curr_df = pd.DataFrame(result_scene_dict)
                     curr_df.to_csv(hit_folder_path + '/'+file_list[i].split('.')[0]+'_'+curr_scene+'.csv', sep=',', encoding='utf-8')

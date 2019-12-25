@@ -36,22 +36,26 @@ for label in label_list:
     temp.append(label+'_fix')
     temp.append(label+'_per')
     temp.append(label+'_ret')
+    for i in range(3):
+        temp.append(label + '_fix'+str(i))
+        temp.append(label + '_per'+str(i))
+        temp.append(label + '_ret'+str(i))
 
 print(temp)
 dfObj = pd.DataFrame([], columns = temp)
 dfObj.to_csv('participants_label.csv' , sep=',')
 '''
 participants = pd.read_csv('participants_label.csv', sep=',')
-# print(participants.head())
-# assert (False)
+print(participants.head())
+
 ################################################
 # longest duration of time spent looking at the suspect
 ################################################
-def fixation(df, label):
+def fixation(df, label, start1, end1):
     start = 0
     end = 0
     length = 0
-    for i in range(len(df[label])):
+    for i in range(start1, end1):
 
         if df[label][i] == True:
 
@@ -70,9 +74,9 @@ def fixation(df, label):
 ################################################
 # This could simply be calculated as the number of seconds spent looking at the suspect divided by 30
 ################################################
-def percentage_of_time_on_suspect(df, label):
+def percentage_of_time_on_suspect(df, label, start, end):
     count_spend = 0
-    for i in range(len(df[label])):
+    for i in range(start, end):
         if df[label][i] == True:
             count_spend += 1
     return count_spend / len(df[label])
@@ -80,10 +84,10 @@ def percentage_of_time_on_suspect(df, label):
 ################################################
 # how many times participant return to suspect
 ################################################
-def returns_to_suspect(df, label):
+def returns_to_suspect(df, label, start, end):
     flag = False
     count_return = 0
-    for i in range(len(df[label])):
+    for i in range(start, end):
         if df[label][i] == True and flag == False:
             count_return += 1
             flag = True
@@ -93,7 +97,7 @@ def returns_to_suspect(df, label):
 
 
 
-data_dir_name = '/Users/yuanguo/MHC/BEARS LAB/data/PUF WSU DATA'
+data_dir_name = '/Users/yuanguo/MHC/BEARS LAB/data/PUF WSU DATA 2'
 print ("the folder is %s" % (data_dir_name))
 
 tobii_eye_folder_name = 'HIT'
@@ -121,7 +125,7 @@ for par_id in participants_ids:
                             l = 'scene'+line[:-1].split(' ')[0][8:-1]
 
                             par_dict[l+'_rt'] = line[:-1].split(' ')[1]
-                            # print(l[:-1], line[:-1].split(' ')[1])
+
             if 'PR' in single_file:
                 flag_pr = False
                 with open(data_dir_name + '/' + par_id + '/' + single_file, "r") as ins:
@@ -154,12 +158,17 @@ for par_id in participants_ids:
                         # print('scene_name: ', scene_name, ', long fix: ', fixation(df, label), ', percen: ', percentage_of_time_on_suspect(df, label), ', return: ', returns_to_suspect(df, label))
                         scene_label = scene_name.split('.')[0].split('_')[-1]+'_'+label
 
-                        par_dict[scene_label+'_fix'] = fixation(df, label)
-                        par_dict[scene_label+'_per'] = percentage_of_time_on_suspect(df, label)
-                        par_dict[scene_label+'_ret'] = returns_to_suspect(df, label)
+                        par_dict[scene_label+'_fix'] = fixation(df, label, 0, len(df[label]) )
+                        par_dict[scene_label+'_per'] = percentage_of_time_on_suspect(df, label, 0, len(df[label]))
+                        par_dict[scene_label+'_ret'] = returns_to_suspect(df, label, 0, len(df[label]))
+                        for i in range(3):
+                            unit_length = int(len(df[label]) / 3)
+                            par_dict[scene_label + '_fix'+ str(i)] = fixation(df, label, i * unit_length, (i+1) * unit_length)
+                            par_dict[scene_label + '_per'+ str(i)] = percentage_of_time_on_suspect(df, label,  i * unit_length, (i+1) * unit_length)
+                            par_dict[scene_label + '_ret'+ str(i)] = returns_to_suspect(df, label, i * unit_length, (i+1) * unit_length)
         # print(par_dict)
         participants = participants.append(par_dict, ignore_index=True)
-        participants.to_csv('participants.csv', sep=',')
+        participants.to_csv('participants2.csv', sep=',')
 
 
 print('all finish')
