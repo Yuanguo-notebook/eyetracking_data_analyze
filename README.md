@@ -1,7 +1,7 @@
 # eyetracking_data_analyze
 This project is developed for analyzing tobii(embeded in HTC vive) eye tracking data. 
 
-We want to know in each frame if participant was looking at specific area in 360 video. In unity, 360 video is projected on the surface of a sphere. The first thing we do is to find hitting point on the sphere according to pose(participant's position in world coordinate), rotation of vr headset and combined gaze direction. Then we convert the point on 3d sphere to point on equirectangular picture. Therefore we are able to know if that point falls in specific area.
+We want to know in each frame if participant was looking at specific area in 360 video. In unity, 360 video is projected on the surface of a sphere. The first thing we do is to find hitting point on the sphere according to combined gaze direction. Then we convert the point on 3d sphere to point on equirectangular picture. Therefore we are able to know if that point falls in specific area.
 
 ## find intersection of vector and a sphere
 ```
@@ -34,6 +34,9 @@ if theta_value <0 :
 geo_x_px = (theta_value / (2 * np.pi)) * image_w
 geo_y_px = (phi_value / (np.pi)) * image_h
 ```
+## Annotate video frames
+use [labelme](https://github.com/wkentaro/labelme) to annotate equirectangular images.   
+save generated json files for each image under the same folder.  
 
 ## command
 ```
@@ -44,7 +47,6 @@ python process_video.py /.../scene5  # with mp4 file in this folder
 python process.py /.../data    #see data folder structure 
 
 # check in each time stamp where the participants were looking at
-# use [labelme](https://github.com/wkentaro/labelme) to annotate equirectangular images
 # compare hitting point in 2D with annotated 2D images
 python analyze.py
 
@@ -60,6 +62,10 @@ images
 │       ├── frames
 │       ├── crops
 │       ├── flip
+│           ├──image00.jpg
+│           ├──image00.json
+│           ├──image01.jpg
+│           ├──image01.json
 │       ├── video.mp4
 │   ├── scene2          
 │   └── ...  
@@ -78,13 +84,17 @@ data
 ├── 001                   
 │   ├── PUF_IAT_001     #survey data  
 │       ├── ..
-│   ├── WSU_ED_001      #eye tracking data  
-│       ├── timestamp.xml
-│       ├── timestamp2.xml
+│   ├── WSU_ED_001      #raw eye tracking data by Tobii
+│       ├── vr_data_2019XXXXTXXXXXX.csv
+│       ├── vr_data_2019XXXXTXXXXXX.csv
 │       ├── ...
 │   ├── WSU_ED_001_EYE      #processed eye tracking data created by process.py 
-│       ├── timestamp.csv
-│       ├── timestamp2.csv
+│       ├── vr_data_2019XXXXTXXXXXX.csv
+│       ├── vr_data_2019XXXXTXXXXXX.csv
+│       ├── ...
+│   ├── 001_HIT             #info about which object they were looking at, created by analyze.py
+│       ├── vr_data_2019XXXXTXXXXXX_scene1.csv
+│       ├── vr_data_2019XXXXTXXXXXX_scene2.csv
 │       ├── ...
 │   └── WSU_HRV_001.xlsx  #heart rate data
 │   └── WSU_PR_001.txt    #performance data
