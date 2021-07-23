@@ -38,6 +38,9 @@ geo_y_px = (phi_value / (np.pi)) * image_h
 use [labelme](https://github.com/wkentaro/labelme) to annotate equirectangular images.   
 save generated json files for each image under the same folder.  
 
+## Packages
+Download and put geom3.py into the folder from https://github.com/phire/Python-Ray-tracer
+
 ## command
 ```
 # convert 360 video to image frams, crop, flipt each image 

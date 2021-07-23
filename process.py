@@ -6,14 +6,13 @@ import pandas as pd
 import sys
 import os
 
-sys.path.insert(0, '/Users/yuanguo/MHC/BEARS LAB')
-print(sys.path)
+
 import xml.etree.ElementTree as ET
 import math
-from process_eye_data.sphere import Sphere
+from sphere import Sphere
 
 # geom3 adopted from https://github.com/phire/Python-Ray-tracer
-from sphere_to_cubemap.geom3 import Vector3, Point3, Ray3, dot, unit
+from geom3 import Vector3, Point3, Ray3, dot, unit
 from math import sqrt
 
 import numpy  as np
